@@ -13,7 +13,7 @@ Faroswap BOT
   - Auto Deposit PHRS to WPHRS
   - Auto Withdraw WPHRS to PHRS
   - Auto Swap With Random Pairs
-  - Auto Add Liquidity Pool - `No Available For Now`
+  - Auto Add Liquidity Pool
   - Multi Accounts
 
 ### Note: Other features will be updated soon.
