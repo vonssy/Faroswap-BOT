@@ -459,19 +459,27 @@ class Faroswap:
             if not dodo_route:
                 return None, None
 
-            router = dodo_route.get("data", {}).get("to")
             value = dodo_route.get("data", {}).get("value")
             calldata = dodo_route.get("data", {}).get("data")
-            gas_limit = int(dodo_route.get("data", {}).get("gasLimit", 500000))
 
-            gas_price = web3.to_wei(1, "gwei")
+            estimated_gas = await asyncio.to_thread(web3.eth.estimate_gas, {
+                "to": self.MIXSWAP_ROUTER_ADDRESS,
+                "from": address,
+                "data": calldata,
+                "value": int(value)
+            })
+
+            max_priority_fee = web3.to_wei(1, "gwei")
+            max_fee = max_priority_fee
 
             swap_tx = {
-                "to": web3.to_checksum_address(router),
-                "value": int(value),
+                "to": self.MIXSWAP_ROUTER_ADDRESS,
+                "from": address,
                 "data": calldata,
-                "gas": int(gas_limit),
-                "gasPrice": int(gas_price),
+                "value": int(value),
+                "gas": int(estimated_gas * 1.2),
+                "maxFeePerGas": int(max_fee),
+                "maxPriorityFeePerGas": int(max_priority_fee),
                 "nonce": web3.eth.get_transaction_count(address, "pending"),
                 "chainId": web3.eth.chain_id,
             }
