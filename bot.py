@@ -476,13 +476,7 @@ class Faroswap:
 
             value = dodo_route.get("data", {}).get("value")
             calldata = dodo_route.get("data", {}).get("data")
-
-            estimated_gas = await asyncio.to_thread(web3.eth.estimate_gas, {
-                "to": self.MIXSWAP_ROUTER_ADDRESS,
-                "from": address,
-                "data": calldata,
-                "value": int(value)
-            })
+            gas_limit = dodo_route.get("data", {}).get("gasLimit", 300000)
 
             max_priority_fee = web3.to_wei(1, "gwei")
             max_fee = max_priority_fee
@@ -492,7 +486,7 @@ class Faroswap:
                 "from": address,
                 "data": calldata,
                 "value": int(value),
-                "gas": int(estimated_gas * 1.2),
+                "gas": int(gas_limit),
                 "maxFeePerGas": int(max_fee),
                 "maxPriorityFeePerGas": int(max_priority_fee),
                 "nonce": web3.eth.get_transaction_count(address, "pending"),
@@ -684,27 +678,27 @@ class Faroswap:
             except ValueError:
                 print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
         
-        while True:
-            try:
-                amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WETH Amount for Each Swap Tx [1 or 0.01 or 0.001, etc in decimals] -> {Style.RESET_ALL}").strip())
-                if amount > 0:
-                    self.weth_swap_amount = amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}WETH Amount must be greater than 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
+        # while True:
+        #     try:
+        #         amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WETH Amount for Each Swap Tx [1 or 0.01 or 0.001, etc in decimals] -> {Style.RESET_ALL}").strip())
+        #         if amount > 0:
+        #             self.weth_swap_amount = amount
+        #             break
+        #         else:
+        #             print(f"{Fore.RED + Style.BRIGHT}WETH Amount must be greater than 0.{Style.RESET_ALL}")
+        #     except ValueError:
+        #         print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
         
-        while True:
-            try:
-                amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WBTC Amount for Each Swap Tx [1 or 0.01 or 0.001, etc in decimals] -> {Style.RESET_ALL}").strip())
-                if amount > 0:
-                    self.wbtc_swap_amount = amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}WBTC Amount must be greater than 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
+        # while True:
+        #     try:
+        #         amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WBTC Amount for Each Swap Tx [1 or 0.01 or 0.001, etc in decimals] -> {Style.RESET_ALL}").strip())
+        #         if amount > 0:
+        #             self.wbtc_swap_amount = amount
+        #             break
+        #         else:
+        #             print(f"{Fore.RED + Style.BRIGHT}WBTC Amount must be greater than 0.{Style.RESET_ALL}")
+        #     except ValueError:
+        #         print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
 
     def print_add_lp_question(self):
         while True:
@@ -838,7 +832,7 @@ class Faroswap:
             url = (
                 f"https://api.dodoex.io/route-service/v2/widget/getdodoroute?chainId=688688&deadLine={deadline}"
                 f"&apikey=a37546505892e1a952&slippage=3.225&source=dodoV2AndMixWasm&toTokenAddress={to_token}"
-                f"&fromTokenAddress={from_token}&userAddr={address}&estimateGas=false&fromAmount={amount}"
+                f"&fromTokenAddress={from_token}&userAddr={address}&estimateGas=true&fromAmount={amount}"
             )
             proxy = self.get_next_proxy_for_account(address) if use_proxy else None
             connector = ProxyConnector.from_url(proxy) if use_proxy else None
