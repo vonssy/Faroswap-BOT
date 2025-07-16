@@ -53,6 +53,16 @@ Faroswap BOT
 
 ## Configuration
 
+- **pools.json:** You will find the file `pools.json` inside the project directory. Make sure `pools.json` contains data that matches the format expected by the script. Here are examples of file formats:
+  ```json
+    [    
+        {
+            "USDC_USDT": "Your USDC_USDT PMM Pool Address",
+            "USDT_USDC": "Your USDT_USDC PMM Pool Address"
+        }
+    ]
+  ```
+
 ### Screenshots
 
 <div style="text-align: center;">
@@ -76,16 +86,6 @@ Faroswap BOT
 <div style="text-align: center;">
   <img src="images/image7.png" alt="Image" width="500"/>
 </div>
-
-- **pools.json:** You will find the file `pools.json` inside the project directory. Make sure `pools.json` contains data that matches the format expected by the script. Here are examples of file formats:
-  ```json
-    [    
-        {
-            "USDC_USDT": "Your USDC_USDT PMM Pool Address",
-            "USDT_USDC": "Your USDT_USDC PMM Pool Address"
-        }
-    ]
-  ```
   
 - **accounts.txt:** You will find the file `accounts.txt` inside the project directory. Make sure `accounts.txt` contains data that matches the format expected by the script. Here are examples of file formats:
   ```bash
