@@ -7,12 +7,11 @@ Faroswap BOT
 ## Features
 
   - Auto Get Account Information
-  - Auto Run With [Proxyscrape Free Proxy](https://proxyscrape.com/free-proxy-list) - `Choose 1`
-  - Auto Run With Private Proxy - `Choose 2`
-  - Auto Run Without Proxy - `Choose 3`
+  - Auto Run With Proxy - `Choose 1`
+  - Auto Run Without Proxy - `Choose 2`
   - Auto Deposit PHRS to WPHRS
   - Auto Withdraw WPHRS to PHRS
-  - Auto Swap With Random Pairs
+  - Auto Make Random Swap Tx
   - Auto Add Liquidity Pool
   - Multi Accounts
 
