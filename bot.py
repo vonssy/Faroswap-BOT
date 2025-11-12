@@ -676,11 +676,9 @@ class Faroswap:
             "User-Agent": FakeUserAgent().random
         }
 
-        deadline = int(time.time()) + 600
-
-        url = f"{self.BASE_API}/route-service/v2/widget/getdodoroute?chainId=688689&deadLine={deadline}&apikey=a37546505892e1a952&slippage=3.225&source=dodoV2AndMixWasm&toTokenAddress={to_token}&fromTokenAddress={from_token}&userAddr={address}&estimateGas=true&fromAmount={amount_in}"
-        
         for attempt in range(retries):
+            deadline = int(time.time()) + 600
+            url = f"{self.BASE_API}/route-service/v2/widget/getdodoroute?chainId=688689&deadLine={deadline}&apikey=a37546505892e1a952&slippage=3.225&source=dodoV2AndMixWasm&toTokenAddress={to_token}&fromTokenAddress={from_token}&userAddr={address}&estimateGas=true&fromAmount={amount_in}"
             proxy_url = self.get_next_proxy_for_account(address) if use_proxy else None
             connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
             try:
@@ -694,7 +692,7 @@ class Faroswap:
 
                         return result
             except (Exception, ClientResponseError) as e:
-                if attempt < retries - 1:
+                if attempt < retries:
                     self.log(
                         f"{Fore.CYAN+Style.BRIGHT}   Message  :{Style.RESET_ALL}"
                         f"{Fore.RED+Style.BRIGHT} Fetch Dodo Route Failed: {Style.RESET_ALL}"
