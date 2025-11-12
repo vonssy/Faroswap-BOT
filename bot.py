@@ -6,48 +6,96 @@ from aiohttp_socks import ProxyConnector
 from fake_useragent import FakeUserAgent
 from datetime import datetime
 from colorama import *
-import asyncio, random, time, json, re, os, pytz
+import asyncio, random, time, re, os, pytz
 
 wib = pytz.timezone('Asia/Jakarta')
 
 class Faroswap:
     def __init__(self) -> None:
-        self.BASE_API = "https://api.dodoex.io/route-service/v2/widget/getdodoroute"
-        self.RPC_URL = "https://testnet.dplabs-internal.com/"
+        self.BASE_API = "https://api.dodoex.io"
+        self.RPC_URL = "https://atlantic.dplabs-internal.com/"
+        self.EXPLORER = "https://atlantic.pharosscan.xyz/tx/"
         self.PHRS_CONTRACT_ADDRESS = "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE"
-        self.WPHRS_CONTRACT_ADDRESS = "0x3019B247381c850ab53Dc0EE53bCe7A07Ea9155f"
-        self.USDC_CONTRACT_ADDRESS = "0x72df0bcd7276f2dFbAc900D1CE63c272C4BCcCED"
-        self.USDT_CONTRACT_ADDRESS = "0xD4071393f8716661958F766DF660033b3d35fD29"
-        self.DODO_APPROVE_ADDRESS = "0x73CAfc894dBfC181398264934f7Be4e482fc9d40"
-        self.DODO_ROUTER_ADDRESS = "0x3541423f25A1Ca5C98fdBCf478405d3f0aaD1164"
-        self.DODO_PROXY02_ADDRESS = "0x4b177AdEd3b8bD1D5D747F91B9E853513838Cd49"
-        self.ERC20_CONTRACT_ABI = json.loads('''[
-            {"type":"function","name":"balanceOf","stateMutability":"view","inputs":[{"name":"address","type":"address"}],"outputs":[{"name":"","type":"uint256"}]},
-            {"type":"function","name":"decimals","stateMutability":"view","inputs":[],"outputs":[{"name":"","type":"uint8"}]},
-            {"type":"function","name":"allowance","stateMutability":"view","inputs":[{"name":"owner","type":"address"},{"name":"spender","type":"address"}],"outputs":[{"name":"","type":"uint256"}]},
-            {"type":"function","name":"approve","stateMutability":"nonpayable","inputs":[{"name":"spender","type":"address"},{"name":"amount","type":"uint256"}],"outputs":[{"name":"","type":"bool"}]},
-            {"type":"function","name":"deposit","stateMutability":"payable","inputs":[],"outputs":[]},
-            {"type":"function","name":"withdraw","stateMutability":"nonpayable","inputs":[{"name":"wad","type":"uint256"}],"outputs":[]}
-        ]''')
-        self.UNISWAP_V2_CONTRACT_ABI = [
+        self.USDT_CONTRACT_ADDRESS = "0xE7E84B8B4f39C507499c40B4ac199B050e2882d5"
+        self.USDC_CONTRACT_ADDRESS = "0xE0BE08c77f415F577A1B3A9aD7a1Df1479564ec8"
+        self.DODO_APPROVE_ADDRESS = "0x4Cf317b8918FbE8A890c01eDAb7d548555Ac2cE9"
+        self.DODO_ROUTE_PROXY_ADDRESS = "0x819829e5CF6e19F9fED92F6b4CC1edF45a2cC4A2"
+        self.POSITION_MANAGER_ADDRESS = "0x1c430d84DD6185b1Ea2d4693e0033799d193542f"
+        self.CONTRACT_ABI = [
             {
-                "type": "function",
-                "name": "addDVMLiquidity",
-                "stateMutability": "nonpayable",
                 "inputs": [
-                    { "internalType": "address", "name": "dvmAddress", "type": "address" },
-                    { "internalType": "uint256", "name": "baseInAmount", "type": "uint256" },
-                    { "internalType": "uint256", "name": "quoteInAmount", "type": "uint256" },
-                    { "internalType": "uint256", "name": "baseMinAmount", "type": "uint256" },
-                    { "internalType": "uint256", "name": "quoteMinAmount", "type": "uint256" },
-                    { "internalType": "uint8", "name": "flag", "type": "uint8" },
-                    { "internalType": "uint256", "name": "deadLine", "type": "uint256" }
+                    { "internalType": "address", "name": "owner", "type": "address" },
+                    { "internalType": "address", "name": "spender", "type": "address" }
                 ],
+                "name": "allowance",
                 "outputs": [
-                    { "internalType": "uint256", "name": "shares", "type": "uint256" },
-                    { "internalType": "uint256", "name": "baseAdjustedInAmount", "type": "uint256" },
-                    { "internalType": "uint256", "name": "quoteAdjustedInAmount", "type": "uint256" }
-                ]
+                    { "internalType": "uint256", "name": "", "type": "uint256" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "address", "name": "spender", "type": "address" },
+                    { "internalType": "uint256", "name": "value", "type": "uint256" }
+                ],
+                "name": "approve",
+                "outputs": [
+                    { "internalType": "bool", "name": "", "type": "bool" }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    { "internalType": "address", "name": "account", "type": "address" }
+                ],
+                "name": "balanceOf",
+                "outputs": [
+                    { "internalType": "uint256", "name": "", "type": "uint256" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "decimals",
+                "outputs": [
+                    { "internalType": "uint8", "name": "", "type": "uint8" }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "components": [
+                            { "internalType": "address", "name": "token0", "type": "address" },
+                            { "internalType": "address", "name": "token1", "type": "address" },
+                            { "internalType": "uint24", "name": "fee", "type": "uint24" },
+                            { "internalType": "int24", "name": "tickLower", "type": "int24" },
+                            { "internalType": "int24", "name": "tickUpper", "type": "int24" },
+                            { "internalType": "uint256", "name": "amount0Desired", "type": "uint256" },
+                            { "internalType": "uint256", "name": "amount1Desired", "type": "uint256" },
+                            { "internalType": "uint256", "name": "amount0Min", "type": "uint256" },
+                            { "internalType": "uint256", "name": "amount1Min", "type": "uint256" },
+                            { "internalType": "address", "name": "recipient", "type": "address" },
+                            { "internalType": "uint256", "name": "deadline", "type": "uint256" }
+                        ],
+                        "internalType": "struct INonfungiblePositionManager.MintParams",
+                        "name": "params",
+                        "type": "tuple"
+                    }
+                ],
+                "name": "mint",
+                "outputs": [
+                    { "internalType": "uint256", "name": "tokenId", "type": "uint256" },
+                    { "internalType": "uint128", "name": "liquidity", "type": "uint128" },
+                    { "internalType": "uint256", "name": "amount0", "type": "uint256" },
+                    { "internalType": "uint256", "name": "amount1", "type": "uint256" }
+                ],
+                "stateMutability": "payable",
+                "type": "function"
             }
         ]
         self.HEADERS = {}
@@ -56,13 +104,10 @@ class Faroswap:
         self.account_proxies = {}
         self.pool_addresses = []
         self.used_nonce = {}
-        self.wrap_option = 0
-        self.wrap_amount = 0
         self.swap_count = 0
         self.phrs_swap_amount = 0
-        self.wphrs_swap_amount = 0
-        self.usdc_swap_amount = 0
         self.usdt_swap_amount = 0
+        self.usdc_swap_amount = 0
         self.liquidity_count = 0
         self.liquidity_amount = 0
         self.min_delay = 0
@@ -92,21 +137,6 @@ class Faroswap:
         hours, remainder = divmod(seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
         return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
-    
-    def load_pools(self):
-        filename = "pools.json"
-        try:
-            if not os.path.exists(filename):
-                self.log(f"{Fore.RED}File {filename} Not Found.{Style.RESET_ALL}")
-                return
-
-            with open(filename, 'r') as file:
-                data = json.load(file)
-                if isinstance(data, list):
-                    return data
-                return []
-        except json.JSONDecodeError:
-            return []
     
     async def load_proxies(self):
         filename = "proxy.txt"
@@ -196,49 +226,18 @@ class Faroswap:
             return None
         
     def generate_swap_option(self):
-        token_data = {
-            "PHRS": (self.PHRS_CONTRACT_ADDRESS, self.phrs_swap_amount),
-            "WPHRS": (self.WPHRS_CONTRACT_ADDRESS, self.wphrs_swap_amount),
-            "USDC": (self.USDC_CONTRACT_ADDRESS, self.usdc_swap_amount),
-            "USDT": (self.USDT_CONTRACT_ADDRESS, self.usdt_swap_amount)
-        }
+        pairs = [
+            ("PHRS", "USDT", self.PHRS_CONTRACT_ADDRESS, self.USDT_CONTRACT_ADDRESS, self.phrs_swap_amount),
+            ("PHRS", "USDC", self.PHRS_CONTRACT_ADDRESS, self.USDC_CONTRACT_ADDRESS, self.phrs_swap_amount),
+            ("USDT", "PHRS", self.USDT_CONTRACT_ADDRESS, self.PHRS_CONTRACT_ADDRESS, self.usdt_swap_amount),
+            ("USDT", "USDC", self.USDT_CONTRACT_ADDRESS, self.USDC_CONTRACT_ADDRESS, self.usdt_swap_amount),
+            ("USDC", "PHRS", self.USDC_CONTRACT_ADDRESS, self.PHRS_CONTRACT_ADDRESS, self.usdc_swap_amount),
+            ("USDC", "USDT", self.USDC_CONTRACT_ADDRESS, self.USDT_CONTRACT_ADDRESS, self.usdc_swap_amount)
+        ]
 
-        tickers = list(token_data.keys())
+        from_ticker, to_ticker, from_token, to_token, amount_in = random.choice(pairs)
 
-        while True:
-            # from_ticker = random.choice(tickers)
-            # to_ticker = random.choice(tickers)
-
-            from_ticker = random.choice(["PHRS", "WPHRS"])
-            to_ticker = random.choice(["USDC", "USDT"])
-
-            if from_ticker == to_ticker:
-                continue
-
-            if (from_ticker == "PHRS" and to_ticker == "WPHRS") or (from_ticker == "WPHRS" and to_ticker == "PHRS"):
-                continue
-
-            from_token, amount_in = token_data[from_ticker]
-            to_token, _ = token_data[to_ticker]
-
-            return from_ticker, to_ticker, from_token, to_token, amount_in
-        
-    def generate_liquidity_option(self):
-        pool_dict = random.choice(self.pool_addresses)
-
-        pair, pair_address = random.choice(list(pool_dict.items()))
-
-        base_ticker, quote_ticker = pair.split("_")
-
-        token_addresses = {
-            "USDC": self.USDC_CONTRACT_ADDRESS,
-            "USDT": self.USDT_CONTRACT_ADDRESS,
-        }
-
-        base_address = token_addresses[base_ticker]
-        quote_address = token_addresses[quote_ticker]
-
-        return pair_address, base_ticker, quote_ticker, base_address, quote_address
+        return from_ticker, to_ticker, from_token, to_token, amount_in
 
     async def get_web3_with_check(self, address: str, use_proxy: bool, retries=3, timeout=60):
         request_kwargs = {"timeout": timeout}
@@ -300,7 +299,7 @@ class Faroswap:
                     balance = web3.eth.get_balance(address)
                     decimals = 18
                 else:
-                    token_contract = web3.eth.contract(address=web3.to_checksum_address(contract_address), abi=self.ERC20_CONTRACT_ABI)
+                    token_contract = web3.eth.contract(address=web3.to_checksum_address(contract_address), abi=self.CONTRACT_ABI)
                     balance = token_contract.functions.balanceOf(address).call()
                     decimals = token_contract.functions.decimals().call()
 
@@ -317,85 +316,11 @@ class Faroswap:
                 )
                 return None
         
-    async def perform_wrapped(self, account: str, address: str, use_proxy: bool):
-        try:
-            web3 = await self.get_web3_with_check(address, use_proxy)
-
-            contract_address = web3.to_checksum_address(self.WPHRS_CONTRACT_ADDRESS)
-            token_contract = web3.eth.contract(address=contract_address, abi=self.ERC20_CONTRACT_ABI)
-
-            amount_to_wei = web3.to_wei(self.wrap_amount, "ether")
-            wrap_data = token_contract.functions.deposit()
-            estimated_gas = wrap_data.estimate_gas({"from":address, "value":amount_to_wei})
-
-            max_priority_fee = web3.to_wei(1, "gwei")
-            max_fee = max_priority_fee
-
-            wrap_tx = wrap_data.build_transaction({
-                "from": address,
-                "value": amount_to_wei,
-                "gas": int(estimated_gas * 1.2),
-                "maxFeePerGas": int(max_fee),
-                "maxPriorityFeePerGas": int(max_priority_fee),
-                "nonce": self.used_nonce[address],
-                "chainId": web3.eth.chain_id,
-            })
-
-            tx_hash = await self.send_raw_transaction_with_retries(account, web3, wrap_tx)
-            receipt = await self.wait_for_receipt_with_retries(web3, tx_hash)
-            block_number = receipt.blockNumber
-            self.used_nonce[address] += 1
-
-            return tx_hash, block_number
-        except Exception as e:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}     Message  :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
-            )
-            return None, None
-        
-    async def perform_unwrapped(self, account: str, address: str, use_proxy: bool):
-        try:
-            web3 = await self.get_web3_with_check(address, use_proxy)
-
-            contract_address = web3.to_checksum_address(self.WPHRS_CONTRACT_ADDRESS)
-            token_contract = web3.eth.contract(address=contract_address, abi=self.ERC20_CONTRACT_ABI)
-
-            amount_to_wei = web3.to_wei(self.wrap_amount, "ether")
-            unwrap_data = token_contract.functions.withdraw(amount_to_wei)
-            estimated_gas = unwrap_data.estimate_gas({"from":address})
-
-            max_priority_fee = web3.to_wei(1, "gwei")
-            max_fee = max_priority_fee
-
-            unwrap_tx = unwrap_data.build_transaction({
-                "from": address,
-                "gas": int(estimated_gas * 1.2),
-                "maxFeePerGas": int(max_fee),
-                "maxPriorityFeePerGas": int(max_priority_fee),
-                "nonce": self.used_nonce[address],
-                "chainId": web3.eth.chain_id,
-            })
-
-            tx_hash = await self.send_raw_transaction_with_retries(account, web3, unwrap_tx)
-            receipt = await self.wait_for_receipt_with_retries(web3, tx_hash)
-            block_number = receipt.blockNumber
-            self.used_nonce[address] += 1
-
-            return tx_hash, block_number
-        except Exception as e:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}     Message  :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} {str(e)} {Style.RESET_ALL}"
-            )
-            return None, None
-        
-    async def approving_token(self, account: str, address: str, router_address: str, asset_address: str, amount_to_wei: int, use_proxy: bool):
+    async def approving_token(self, account: str, address: str, spender: str, asset_address: str, amount_to_wei: int, use_proxy: bool):
         try:
             web3 = await self.get_web3_with_check(address, use_proxy)
             
-            spender = web3.to_checksum_address(router_address)
-            token_contract = web3.eth.contract(address=web3.to_checksum_address(asset_address), abi=self.ERC20_CONTRACT_ABI)
+            token_contract = web3.eth.contract(address=asset_address, abi=self.CONTRACT_ABI)
 
             allowance = token_contract.functions.allowance(address, spender).call()
             if allowance < amount_to_wei:
@@ -406,7 +331,7 @@ class Faroswap:
                 max_fee = max_priority_fee
 
                 approve_tx = approve_data.build_transaction({
-                    "from": address,
+                    "from": web3.to_checksum_address(address),
                     "gas": int(estimated_gas * 1.2),
                     "maxFeePerGas": int(max_fee),
                     "maxPriorityFeePerGas": int(max_priority_fee),
@@ -419,11 +344,9 @@ class Faroswap:
                 block_number = receipt.blockNumber
                 self.used_nonce[address] += 1
 
-                explorer = f"https://testnet.pharosscan.xyz/tx/{tx_hash}"
-                
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Approve  :{Style.RESET_ALL}"
-                    f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}"
+                    f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}                      "
                 )
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Block    :{Style.RESET_ALL}"
@@ -435,7 +358,7 @@ class Faroswap:
                 )
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Explorer :{Style.RESET_ALL}"
-                    f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
+                    f"{Fore.WHITE+Style.BRIGHT} {self.EXPLORER}{tx_hash} {Style.RESET_ALL}"
                 )
                 await self.print_timer()
 
@@ -447,12 +370,16 @@ class Faroswap:
         try:
             web3 = await self.get_web3_with_check(address, use_proxy)
 
-            decimals = 6 if from_token in ["USDC", "USDT"] else 18
+            decimals = 18 if from_token == self.PHRS_CONTRACT_ADDRESS else 6
 
             amount_in_wei = int(amount_in * 10**decimals)
 
+            spender = web3.to_checksum_address(self.DODO_APPROVE_ADDRESS)
+            asset_address = web3.to_checksum_address(from_token)
+            router_address = web3.to_checksum_address(self.DODO_ROUTE_PROXY_ADDRESS)
+
             if from_token != self.PHRS_CONTRACT_ADDRESS:
-                await self.approving_token(account, address, self.DODO_APPROVE_ADDRESS, from_token, amount_in_wei, use_proxy)
+                await self.approving_token(account, address, spender, asset_address, amount_in_wei, use_proxy)
 
             route = await self.get_dodo_route(address, from_token, to_token, amount_in_wei, use_proxy)
             if not route: return None, None
@@ -465,8 +392,8 @@ class Faroswap:
             max_fee = max_priority_fee
             
             swap_tx = {
-                "from": address,
-                "to": self.DODO_ROUTER_ADDRESS,
+                "from": web3.to_checksum_address(address),
+                "to": router_address,
                 "value": int(value),
                 "data": calldata,
                 "gas": int(gas_limit),
@@ -489,31 +416,48 @@ class Faroswap:
             )
             return None, None
         
-    async def perform_liquidity(self, account: str, address: str, pair_address: str, amount: float, use_proxy: bool):
+    async def perform_liquidity(self, account: str, address: str, amount: float, use_proxy: bool):
         try:
             web3 = await self.get_web3_with_check(address, use_proxy)
 
-            dvm_address = web3.to_checksum_address(pair_address)
-
-            in_amount = int(amount * 10**6)
-
-            min_amount = int(in_amount * (10000 - 10)) // 10000
-
+            amount0_desired = int(amount * (10**6))
+            amount1_desired = amount0_desired
+            amount0_min = int(amount0_desired * (1 - 0.005))
+            amount1_min = int(amount1_desired * (1 - 0.005))
             deadline = int(time.time()) + 600
 
-            token_contract = web3.eth.contract(address=web3.to_checksum_address(self.DODO_PROXY02_ADDRESS), abi=self.UNISWAP_V2_CONTRACT_ABI)
+            router_address = web3.to_checksum_address(self.POSITION_MANAGER_ADDRESS)
+            token0 = web3.to_checksum_address(self.USDC_CONTRACT_ADDRESS)
+            token1 = web3.to_checksum_address(self.USDT_CONTRACT_ADDRESS)
 
-            liquidity_data = token_contract.functions.addDVMLiquidity(
-                dvm_address, in_amount, in_amount, min_amount, min_amount, 0, deadline
+            await self.approving_token(account, address, router_address, token0, amount0_desired, use_proxy)
+            await self.approving_token(account, address, router_address, token1, amount1_desired, use_proxy)
+
+            mint_params = (
+                token0,
+                token1,
+                500,
+                -887270,
+                887270,
+                amount0_desired,
+                amount1_desired,
+                amount0_min,
+                amount1_min,
+                web3.to_checksum_address(address),
+                deadline
             )
 
-            estimated_gas = liquidity_data.estimate_gas({"from": address})
+            token_contract = web3.eth.contract(address=router_address, abi=self.CONTRACT_ABI)
+
+            mint_data = token_contract.functions.mint(mint_params)
+
+            estimated_gas = mint_data.estimate_gas({"from": address})
 
             max_priority_fee = web3.to_wei(1, "gwei")
             max_fee = max_priority_fee
 
-            liquidity_tx = liquidity_data.build_transaction({
-                "from": address,
+            mint_tx = mint_data.build_transaction({
+                "from": web3.to_checksum_address(address),
                 "gas": int(estimated_gas * 1.2),
                 "maxFeePerGas": int(max_fee),
                 "maxPriorityFeePerGas": int(max_priority_fee),
@@ -521,7 +465,7 @@ class Faroswap:
                 "chainId": web3.eth.chain_id,
             })
 
-            tx_hash = await self.send_raw_transaction_with_retries(account, web3, liquidity_tx)
+            tx_hash = await self.send_raw_transaction_with_retries(account, web3, mint_tx)
             receipt = await self.wait_for_receipt_with_retries(web3, tx_hash)
             block_number = receipt.blockNumber
             self.used_nonce[address] += 1
@@ -534,63 +478,10 @@ class Faroswap:
             )
             return None, None
         
-    def print_wrap_question(self):
-        while True:
-            try:
-                wrap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter PHRS Amount -> {Style.RESET_ALL}").strip())
-                if wrap_amount > 0:
-                    self.wrap_amount = wrap_amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}PHRS Amount must be > 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
-    
-    def print_unwrap_question(self):
-        while True:
-            try:
-                wrap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WPHRS Amount -> {Style.RESET_ALL}").strip())
-                if wrap_amount > 0:
-                    self.wrap_amount = wrap_amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}WPHRS Amount must be > 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
-
-    def print_wrap_or_unwarp_option(self):
-        while True:
-            try:
-                print(f"{Fore.GREEN + Style.BRIGHT}Select Option:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}1. Wrap PHRS{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}2. Unwrap WPHRS{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}3. Skipped{Style.RESET_ALL}")
-                wrap_option = int(input(f"{Fore.BLUE + Style.BRIGHT}Choose [1/2/3] -> {Style.RESET_ALL}").strip())
-
-                if wrap_option in [1, 2, 3]:
-                    wrap_type = (
-                        "Wrap PHRS" if wrap_option == 1 else 
-                        "Unwrap WPHRS" if wrap_option == 2 else 
-                        "Skipped"
-                    )
-                    print(f"{Fore.GREEN + Style.BRIGHT}{wrap_type} Selected.{Style.RESET_ALL}")
-                    self.wrap_option = wrap_option
-
-                    if self.wrap_option == 1:
-                        self.print_wrap_question()
-                    elif self.wrap_option == 2:
-                        self.print_unwrap_question()
-
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}Please enter either 1 or 2.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a number (1 or 2).{Style.RESET_ALL}")
-
     def print_swap_question(self):
         while True:
             try:
-                swap_count = int(input(f"{Fore.YELLOW + Style.BRIGHT}Swap Count For Each Wallet -> {Style.RESET_ALL}").strip())
+                swap_count = int(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Swap Count -> {Style.RESET_ALL}").strip())
                 if swap_count > 0:
                     self.swap_count = swap_count
                     break
@@ -601,52 +492,41 @@ class Faroswap:
 
         while True:
             try:
-                phrs_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter PHRS Swap Amount -> {Style.RESET_ALL}").strip())
+                phrs_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Swap Amount [PHRS] -> {Style.RESET_ALL}").strip())
                 if phrs_swap_amount > 0:
                     self.phrs_swap_amount = phrs_swap_amount
                     break
                 else:
-                    print(f"{Fore.RED + Style.BRIGHT}PHRS Swap Amount must be > 0.{Style.RESET_ALL}")
+                    print(f"{Fore.RED + Style.BRIGHT}Amount must be > 0.{Style.RESET_ALL}")
             except ValueError:
                 print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
 
         while True:
             try:
-                wphrs_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter WPHRS Swap Amount -> {Style.RESET_ALL}").strip())
-                if wphrs_swap_amount > 0:
-                    self.wphrs_swap_amount = wphrs_swap_amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}WPHRS Swap Amount must be > 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
-
-        while True:
-            try:
-                usdc_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter USDC Swap Amount -> {Style.RESET_ALL}").strip())
-                if usdc_swap_amount > 0:
-                    self.usdc_swap_amount = usdc_swap_amount
-                    break
-                else:
-                    print(f"{Fore.RED + Style.BRIGHT}USDC Swap Amount must be > 0.{Style.RESET_ALL}")
-            except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
-
-        while True:
-            try:
-                usdt_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter USDT Swap Amount -> {Style.RESET_ALL}").strip())
+                usdt_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Swap Amount [USDT] -> {Style.RESET_ALL}").strip())
                 if usdt_swap_amount > 0:
                     self.usdt_swap_amount = usdt_swap_amount
                     break
                 else:
-                    print(f"{Fore.RED + Style.BRIGHT}USDT Swap Amount must be > 0.{Style.RESET_ALL}")
+                    print(f"{Fore.RED + Style.BRIGHT}Amount must be > 0.{Style.RESET_ALL}")
+            except ValueError:
+                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
+
+        while True:
+            try:
+                usdc_swap_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Swap Amount [USDC] -> {Style.RESET_ALL}").strip())
+                if usdc_swap_amount > 0:
+                    self.usdc_swap_amount = usdc_swap_amount
+                    break
+                else:
+                    print(f"{Fore.RED + Style.BRIGHT}Amount must be > 0.{Style.RESET_ALL}")
             except ValueError:
                 print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a float or decimal number.{Style.RESET_ALL}")
 
     def print_liquidity_question(self):
         while True:
             try:
-                liquidity_count = int(input(f"{Fore.YELLOW + Style.BRIGHT}Add Liquidity Count For Each Wallet -> {Style.RESET_ALL}").strip())
+                liquidity_count = int(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Add Liquidity Count -> {Style.RESET_ALL}").strip())
                 if liquidity_count > 0:
                     self.liquidity_count = liquidity_count
                     break
@@ -657,7 +537,7 @@ class Faroswap:
 
         while True:
             try:
-                liquidity_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Liquidity Amount -> {Style.RESET_ALL}").strip())
+                liquidity_amount = float(input(f"{Fore.YELLOW + Style.BRIGHT}Enter Liquidity Amount [USDC/USDT] -> {Style.RESET_ALL}").strip())
                 if liquidity_amount > 0:
                     self.liquidity_amount = liquidity_amount
                     break
@@ -706,46 +586,33 @@ class Faroswap:
         while True:
             try:
                 print(f"{Fore.GREEN + Style.BRIGHT}Select Option:{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}1. Wrap PHRS{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}2. Unwrap WPHRS{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}3. Random Swap{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}4. Add Liquidity{Style.RESET_ALL}")
-                print(f"{Fore.WHITE + Style.BRIGHT}5. Run All Features{Style.RESET_ALL}")
-                option = int(input(f"{Fore.BLUE + Style.BRIGHT}Choose [1/2/3/4/5] -> {Style.RESET_ALL}").strip())
+                print(f"{Fore.WHITE + Style.BRIGHT}1. Random Swap{Style.RESET_ALL}")
+                print(f"{Fore.WHITE + Style.BRIGHT}2. Add Liquidity{Style.RESET_ALL}")
+                print(f"{Fore.WHITE + Style.BRIGHT}3. Run All Features{Style.RESET_ALL}")
+                option = int(input(f"{Fore.BLUE + Style.BRIGHT}Choose [1/2/3] -> {Style.RESET_ALL}").strip())
 
-                if option in [1, 2, 3, 4, 5]:
+                if option in [1, 2, 3]:
                     option_type = (
-                        "Wrap PHRS" if option == 1 else 
-                        "Unwrap WPHRS" if option == 2 else 
-                        "Random Swap" if option == 3 else
-                        "Add Liquidity" if option == 4 else
+                        "Random Swap" if option == 1 else
+                        "Add Liquidity" if option == 2 else
                         "Run All Features"
                     )
                     print(f"{Fore.GREEN + Style.BRIGHT}{option_type} Selected.{Style.RESET_ALL}")
                     break
                 else:
-                    print(f"{Fore.RED + Style.BRIGHT}Please enter either 1, 2, 3, 4, or 5.{Style.RESET_ALL}")
+                    print(f"{Fore.RED + Style.BRIGHT}Please enter either 1, 2, or 3.{Style.RESET_ALL}")
             except ValueError:
-                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a number (1, 2, 3, 4, or 5).{Style.RESET_ALL}")
+                print(f"{Fore.RED + Style.BRIGHT}Invalid input. Enter a number (1, 2, or 3).{Style.RESET_ALL}")
 
         if option == 1:
-            self.print_wrap_question()
-            self.print_delay_question()
-
-        elif option == 2:
-            self.print_unwrap_question()
-            self.print_delay_question()
-
-        elif option == 3:
             self.print_swap_question()
             self.print_delay_question()
 
-        elif option == 4:
+        elif option == 2:
             self.print_liquidity_question()
             self.print_delay_question()
 
-        elif option == 5:
-            self.print_wrap_or_unwarp_option()
+        elif option == 3:
             self.print_swap_question()
             self.print_liquidity_question()
             self.print_delay_question()
@@ -797,7 +664,7 @@ class Faroswap:
             )
             return None
         
-    async def get_dodo_route(self, address: str, from_token: str, to_token: str, amount_in: int, use_proxy: bool):
+    async def get_dodo_route(self, address: str, from_token: str, to_token: str, amount_in: int, use_proxy: bool, retries=5):
         headers = {
             "Accept": "application/json, text/plain, */*",
             "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -811,26 +678,31 @@ class Faroswap:
 
         deadline = int(time.time()) + 600
 
-        url = f"{self.BASE_API}?chainId=688688&deadLine={deadline}&apikey=a37546505892e1a952&slippage=1&source=dodoV2AndMixWasm&toTokenAddress={to_token}&fromTokenAddress={from_token}&userAddr={address}&estimateGas=true&fromAmount={amount_in}"
+        url = f"{self.BASE_API}/route-service/v2/widget/getdodoroute?chainId=688689&deadLine={deadline}&apikey=a37546505892e1a952&slippage=3.225&source=dodoV2AndMixWasm&toTokenAddress={to_token}&fromTokenAddress={from_token}&userAddr={address}&estimateGas=true&fromAmount={amount_in}"
         
-        proxy_url = self.get_next_proxy_for_account(address) if use_proxy else None
-        connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
-        try:
-            async with ClientSession(connector=connector, timeout=ClientTimeout(total=60)) as session:
-                async with session.get(url=url, headers=headers, proxy=proxy, proxy_auth=proxy_auth) as response:
-                    response.raise_for_status()
-                    result = await response.json()
-                    if result.get("status") != 200:
-                        err_msg = result.get("data", "Quote Not Available")
-                        raise ValueError(err_msg)
+        for attempt in range(retries):
+            proxy_url = self.get_next_proxy_for_account(address) if use_proxy else None
+            connector, proxy, proxy_auth = self.build_proxy_config(proxy_url)
+            try:
+                async with ClientSession(connector=connector, timeout=ClientTimeout(total=60)) as session:
+                    async with session.get(url=url, headers=headers, proxy=proxy, proxy_auth=proxy_auth) as response:
+                        response.raise_for_status()
+                        result = await response.json()
+                        if result.get("status") != 200:
+                            err_msg = result.get("data", "Quote Not Available")
+                            raise ValueError(err_msg)
 
-                    return result
-        except (Exception, ClientResponseError) as e:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Message  :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} Fetch Dodo Route Failed: {str(e)} {Style.RESET_ALL}"
-            )
-            return None
+                        return result
+            except (Exception, ClientResponseError) as e:
+                if attempt < retries - 1:
+                    self.log(
+                        f"{Fore.CYAN+Style.BRIGHT}   Message  :{Style.RESET_ALL}"
+                        f"{Fore.RED+Style.BRIGHT} Fetch Dodo Route Failed: {Style.RESET_ALL}"
+                        f"{Fore.YELLOW+Style.BRIGHT}{str(e)} [Attempt: {attempt+1}/{retries}]{Style.RESET_ALL}"
+                    )
+                    await asyncio.sleep(3)
+                    continue
+                return None
     
     async def process_check_connection(self, address: str, use_proxy: bool, rotate_proxy: bool):
         while True:
@@ -851,62 +723,9 @@ class Faroswap:
             
             return True
         
-    async def process_perform_wrapped(self, account: str, address: str, use_proxy: bool):
-        tx_hash, block_number = await self.perform_wrapped(account, address, use_proxy)
-        if tx_hash and block_number:
-            explorer = f"https://testnet.pharosscan.xyz/tx/{tx_hash}"
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Block    :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {block_number} {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Tx Hash  :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {tx_hash} {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Explorer :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
-            )
-        else:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} Perform On-Chain Failed {Style.RESET_ALL}"
-            )
-
-    async def process_perform_unwrapped(self, account: str, address: str, use_proxy: bool):
-        tx_hash, block_number = await self.perform_unwrapped(account, address, use_proxy)
-        if tx_hash and block_number:
-            explorer = f"https://testnet.pharosscan.xyz/tx/{tx_hash}"
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Block    :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {block_number} {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Tx Hash  :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {tx_hash} {Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Explorer :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
-            )
-        else:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.RED+Style.BRIGHT} Perform On-Chain Failed {Style.RESET_ALL}"
-            )
-
     async def process_perform_swap(self, account: str, address: str, from_token: str, to_token: str, amount_in: float, use_proxy: bool):
         tx_hash, block_number = await self.perform_swap(account, address, from_token, to_token, amount_in, use_proxy)
         if tx_hash and block_number:
-            explorer = f"https://testnet.pharosscan.xyz/tx/{tx_hash}"
             self.log(
                 f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
                 f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}                      "
@@ -921,7 +740,7 @@ class Faroswap:
             )
             self.log(
                 f"{Fore.CYAN+Style.BRIGHT}   Explorer :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT} {self.EXPLORER}{tx_hash} {Style.RESET_ALL}"
             )
         else:
             self.log(
@@ -929,10 +748,9 @@ class Faroswap:
                 f"{Fore.RED+Style.BRIGHT} Perform On-Chain Failed {Style.RESET_ALL}"
             )
 
-    async def process_perform_liquidity(self, account: str, address: str, pair_address: str, amount: float, use_proxy: bool):
-        tx_hash, block_number = await self.perform_liquidity(account, address, pair_address, amount, use_proxy)
+    async def process_perform_liquidity(self, account: str, address: str, amount: float, use_proxy: bool):
+        tx_hash, block_number = await self.perform_liquidity(account, address, amount, use_proxy)
         if tx_hash and block_number:
-            explorer = f"https://testnet.pharosscan.xyz/tx/{tx_hash}"
             self.log(
                 f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
                 f"{Fore.GREEN+Style.BRIGHT} Success {Style.RESET_ALL}                      "
@@ -947,7 +765,7 @@ class Faroswap:
             )
             self.log(
                 f"{Fore.CYAN+Style.BRIGHT}   Explorer :{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {explorer} {Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT} {self.EXPLORER}{tx_hash} {Style.RESET_ALL}"
             )
         else:
             self.log(
@@ -956,56 +774,12 @@ class Faroswap:
             )
 
     async def process_option_1(self, account: str, address: str, use_proxy):
-        self.log(f"{Fore.CYAN+Style.BRIGHT}Wrapped   :{Style.RESET_ALL}                      ")
-
-        balance = await self.get_token_balance(address, self.PHRS_CONTRACT_ADDRESS, use_proxy)
-        self.log(
-            f"{Fore.CYAN+Style.BRIGHT}   Balance :{Style.RESET_ALL}"
-            f"{Fore.WHITE+Style.BRIGHT} {balance} PHRS {Style.RESET_ALL}"
-        )
-        self.log(
-            f"{Fore.CYAN+Style.BRIGHT}   Amount  :{Style.RESET_ALL}"
-            f"{Fore.WHITE+Style.BRIGHT} {self.wrap_amount} PHRS {Style.RESET_ALL}"
-        )
-
-        if not balance or balance <=  self.wrap_amount:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.YELLOW+Style.BRIGHT} Insufficient PHRS Token Balance {Style.RESET_ALL}"
-            )
-            return
-        
-        await self.process_perform_wrapped(account, address, use_proxy)
-
-    async def process_option_2(self, account: str, address: str, use_proxy):
-        self.log(f"{Fore.CYAN+Style.BRIGHT}Unwrapped :{Style.RESET_ALL}                      ")
-
-        balance = await self.get_token_balance(address, self.WPHRS_CONTRACT_ADDRESS, use_proxy)
-        self.log(
-            f"{Fore.CYAN+Style.BRIGHT}   Balance  :{Style.RESET_ALL}"
-            f"{Fore.WHITE+Style.BRIGHT} {balance} WPHRS {Style.RESET_ALL}"
-        )
-        self.log(
-            f"{Fore.CYAN+Style.BRIGHT}   Amount   :{Style.RESET_ALL}"
-            f"{Fore.WHITE+Style.BRIGHT} {self.wrap_amount} WPHRS {Style.RESET_ALL}"
-        )
-
-        if not balance or balance <=  self.wrap_amount:
-            self.log(
-                f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                f"{Fore.YELLOW+Style.BRIGHT} Insufficient WPHRS Token Balance {Style.RESET_ALL}"
-            )
-            return
-        
-        await self.process_perform_unwrapped(account, address, use_proxy)
-
-    async def process_option_3(self, account: str, address: str, use_proxy):
         self.log(f"{Fore.CYAN+Style.BRIGHT}Swap      :{Style.RESET_ALL}                      ")
         for i in range(self.swap_count):
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                 f"{Fore.GREEN+Style.BRIGHT}Swap{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {i+1} / {self.swap_count} {Style.RESET_ALL}                           "
+                f"{Fore.WHITE+Style.BRIGHT} {i+1} Of {self.swap_count} {Style.RESET_ALL}                           "
             )
 
             from_ticker, to_ticker, from_token, to_token, amount_in = self.generate_swap_option()
@@ -1026,7 +800,14 @@ class Faroswap:
                 f"{Fore.WHITE+Style.BRIGHT} {amount_in} {from_ticker} {Style.RESET_ALL}"
             )
 
-            if not balance or balance <=  amount_in:
+            if balance is None:
+                self.log(
+                    f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} Fetch {from_ticker} Token Balance Failed {Style.RESET_ALL}"
+                )
+                continue
+
+            if balance <=  amount_in:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
                     f"{Fore.YELLOW+Style.BRIGHT} Insufficient {from_ticker} Token Balance {Style.RESET_ALL}"
@@ -1036,59 +817,72 @@ class Faroswap:
             await self.process_perform_swap(account, address, from_token, to_token, amount_in, use_proxy)
             await self.print_timer()
 
-    async def process_option_4(self, account: str, address: str, use_proxy):
+    async def process_option_2(self, account: str, address: str, use_proxy):
         self.log(f"{Fore.CYAN+Style.BRIGHT}Liquidity :{Style.RESET_ALL}                      ")
         for i in range(self.liquidity_count):
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT} ● {Style.RESET_ALL}"
                 f"{Fore.GREEN+Style.BRIGHT}Liquidity{Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT} {i+1} / {self.liquidity_count} {Style.RESET_ALL}                           "
+                f"{Fore.WHITE+Style.BRIGHT} {i+1} Of {self.liquidity_count} {Style.RESET_ALL}                           "
             )
-
-            pair_address, base_ticker, quote_ticker, base_address, quote_address = self.generate_liquidity_option()
 
             self.log(
                 f"{Fore.CYAN+Style.BRIGHT}   Option   :{Style.RESET_ALL}"
-                f"{Fore.BLUE+Style.BRIGHT} {base_ticker}/{quote_ticker} {Style.RESET_ALL}"
+                f"{Fore.BLUE+Style.BRIGHT} USDC/USDT {Style.RESET_ALL}"
             )
 
-            balance0 = await self.get_token_balance(address, base_address, use_proxy)
-            balance1 = await self.get_token_balance(address, quote_address, use_proxy)
+            self.log(f"{Fore.CYAN+Style.BRIGHT}   Amount   :{Style.RESET_ALL}")
+            self.log(
+                f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT}{self.liquidity_amount} USDC{Style.RESET_ALL}"
+            )
+            self.log(
+                f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT}{self.liquidity_amount} USDT{Style.RESET_ALL}"
+            )
+
+            balance0 = await self.get_token_balance(address, self.USDC_CONTRACT_ADDRESS, use_proxy)
+            balance1 = await self.get_token_balance(address, self.USDT_CONTRACT_ADDRESS, use_proxy)
 
             self.log(f"{Fore.CYAN+Style.BRIGHT}   Balance  :{Style.RESET_ALL}")
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT}{balance0} {base_ticker}{Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT}{balance0} USDC{Style.RESET_ALL}"
             )
             self.log(
                 f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT}{balance1} {quote_ticker}{Style.RESET_ALL}"
-            )
-            self.log(f"{Fore.CYAN+Style.BRIGHT}   Amount   :{Style.RESET_ALL}")
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT}{self.liquidity_amount} {base_ticker}{Style.RESET_ALL}"
-            )
-            self.log(
-                f"{Fore.MAGENTA+Style.BRIGHT}      ● {Style.RESET_ALL}"
-                f"{Fore.WHITE+Style.BRIGHT}{self.liquidity_amount} {quote_ticker}{Style.RESET_ALL}"
+                f"{Fore.WHITE+Style.BRIGHT}{balance1} USDT{Style.RESET_ALL}"
             )
 
-            if not balance0 or balance0 <=  self.liquidity_amount:
+            if balance0 is None:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                    f"{Fore.YELLOW+Style.BRIGHT} Insufficient {base_ticker} Token Balance {Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} Fetch USDC Token Balance Failed {Style.RESET_ALL}"
                 )
                 continue
-            
-            if not balance1 or balance1 <=  self.liquidity_amount:
+
+            if balance1 is None:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
-                    f"{Fore.YELLOW+Style.BRIGHT} Insufficient {quote_ticker} Token Balance {Style.RESET_ALL}"
+                    f"{Fore.RED+Style.BRIGHT} Fetch USDT Token Balance Failed {Style.RESET_ALL}"
                 )
                 continue
+
+            if balance0 <  self.liquidity_amount:
+                self.log(
+                    f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
+                    f"{Fore.YELLOW+Style.BRIGHT} Insufficient USDC Token Balance {Style.RESET_ALL}"
+                )
+                return
+
+            if balance1 <  self.liquidity_amount:
+                self.log(
+                    f"{Fore.CYAN+Style.BRIGHT}   Status   :{Style.RESET_ALL}"
+                    f"{Fore.YELLOW+Style.BRIGHT} Insufficient USDT Token Balance {Style.RESET_ALL}"
+                )
+                return
             
-            await self.process_perform_liquidity(account, address, pair_address, self.liquidity_amount, use_proxy)
+            await self.process_perform_liquidity(account, address, self.liquidity_amount, use_proxy)
             await self.print_timer()
 
     async def process_accounts(self, account: str, address: str, option: int, use_proxy: bool, rotate_proxy: bool):
@@ -1110,48 +904,27 @@ class Faroswap:
             if option == 1:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}Option    :{Style.RESET_ALL}"
-                    f"{Fore.BLUE+Style.BRIGHT} Wrap PHRS {Style.RESET_ALL}"
+                    f"{Fore.BLUE+Style.BRIGHT} Random Swap {Style.RESET_ALL}"
                 )
                 await self.process_option_1(account, address, use_proxy)
 
             elif option == 2:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}Option    :{Style.RESET_ALL}"
-                    f"{Fore.BLUE+Style.BRIGHT} Unwrap WPHRS {Style.RESET_ALL}"
+                    f"{Fore.BLUE+Style.BRIGHT} Add Liquidity {Style.RESET_ALL}"
                 )
                 await self.process_option_2(account, address, use_proxy)
 
             elif option == 3:
                 self.log(
                     f"{Fore.CYAN+Style.BRIGHT}Option    :{Style.RESET_ALL}"
-                    f"{Fore.BLUE+Style.BRIGHT} Random Swap {Style.RESET_ALL}"
-                )
-                await self.process_option_3(account, address, use_proxy)
-
-            elif option == 4:
-                self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Option    :{Style.RESET_ALL}"
-                    f"{Fore.BLUE+Style.BRIGHT} Add Liquidity {Style.RESET_ALL}"
-                )
-                await self.process_option_4(account, address, use_proxy)
-
-            elif option == 5:
-                self.log(
-                    f"{Fore.CYAN+Style.BRIGHT}Option    :{Style.RESET_ALL}"
                     f"{Fore.BLUE+Style.BRIGHT} Run All Features {Style.RESET_ALL}"
                 )
 
-                if self.wrap_option == 1:
-                    await self.process_option_1(account, address, use_proxy)
-                elif self.wrap_option == 2:
-                    await self.process_option_2(account, address, use_proxy)
-
+                await self.process_option_1(account, address, use_proxy)
                 await asyncio.sleep(5)
 
-                await self.process_option_3(account, address, use_proxy)
-                await asyncio.sleep(5)
-
-                await self.process_option_4(account, address, use_proxy)
+                await self.process_option_2(account, address, use_proxy)
                 await asyncio.sleep(5)
 
     async def main(self):
@@ -1159,11 +932,7 @@ class Faroswap:
             with open('accounts.txt', 'r') as file:
                 accounts = [line.strip() for line in file if line.strip()]
 
-            self.pool_addresses = self.load_pools()
-
             option, proxy_choice, rotate_proxy = self.print_question()
-
-            use_proxy = True if proxy_choice == 1 else False
 
             while True:
                 self.clear_terminal()
@@ -1173,6 +942,7 @@ class Faroswap:
                     f"{Fore.WHITE + Style.BRIGHT}{len(accounts)}{Style.RESET_ALL}"
                 )
 
+                use_proxy = True if proxy_choice == 1 else False
                 if use_proxy:
                     await self.load_proxies()
                 
