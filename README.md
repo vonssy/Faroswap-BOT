@@ -1,124 +1,190 @@
-# Faroswap BOT
-Faroswap BOT
+# 🚀 Faroswap BOT
 
-- Link : [Faroswap](https://faroswap.xyz/)
-- Connect Same Wallet With Pharos
+> Automated web3 interaction for efficient crypto farming and multi-account management
 
-## Features
+[![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![GitHub Stars](https://img.shields.io/github/stars/vonssy/Faroswap-BOT.svg)](https://github.com/vonssy/Faroswap-BOT/stargazers)
 
-  - Auto Get Account Information
-  - Auto Run With Proxy - `Choose 1`
-  - Auto Run Without Proxy - `Choose 2`
-  - Auto Deposit PHRS to WPHRS
-  - Auto Withdraw WPHRS to PHRS
-  - Auto Make Random Swap Tx
-  - Auto Add Liquidity Pool
-  - Multi Accounts
+## 📋 Table of Contents
 
-If you need a reliable proxy for multi-wallet automation, airdrop farming, or avoiding geo-restrictions, I recommend **Nstproxy**.  
-Affordable (from $0.1/GB), global coverage, rotation control, and anti-ban tech.
+- [Overview](#overview)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Proxy Recommendation](#proxy-recommendation)
+- [Support](#support)
+- [Contributing](#contributing)
 
-🔗 [Nstproxy.com](https://www.nstproxy.com/?utm_source=vonssy) | [Telegram](https://t.me/nstproxy) | [Discord](https://discord.gg/5jjWCAmvng) | [Github](https://github.com/Nstproxy)  
-👉 Use code **VONSSY** to get **10% OFF**
+## 🎯 Overview
 
-### Note: Other features will be updated soon.
+Faroswap BOT is an automated tool designed to streamline process multiple accounts. It provides seamless integration with Pharos Atlantic Network and offers robust proxy support for enhanced security and reliability.
 
-## Requiremnets
+**🔗 Get Started:** [Register on Faroswap](https://faroswap.xyz/swap)
 
-- Make sure you have Python3.9 or higher installed and pip.
+> **Important:** Connect the new evm wallet for optimal performance.
 
-## Instalation
+## ✨ Features
 
-1. **Clone The Repositories:**
-   ```bash
-   git clone https://github.com/vonssy/Faroswap-BOT.git
-   ```
-   ```bash
-   cd Faroswap-BOT
-   ```
+- 🔄 **Automated Account Management** - Retrieve account information automatically
+- 🌐 **Flexible Proxy Support** - Run with or without proxy configuration
+- 🔀 **Smart Proxy Rotation** - Automatic rotation of invalid proxies
+- ➡️ **Swap Transaction** - Automated Perform Random Swap
+- 🔁 **Add Liquidity Transaction** - Automated Perform Add Liquidity (USDC/USDT)
+- 👥 **Multi-Account Support** - Manage multiple accounts simultaneously
 
-2. **Install Requirements:**
-   ```bash
-   pip install -r requirements.txt #or pip3 install -r requirements.txt
-   ```
+## 📋 Requirements
 
-### Note: Check your web3 and eth-account library version first. If not same with version in requirements.txt, u must uninstall that library.
-- **Check Library Version**
-  ```bash
-    pip show libary_name
-  ```
-- **Uninstall Library**
-  ```bash
-    pip uninstall libary_name
-  ```
-- **Install Library With Version**
-  ```bash
-    pip install libary_name==version
-  ```
+- **Python:** Version 3.9 or higher
+- **pip:** Latest version recommended
+- **Compatible libraries:** web3 and eth-account (see requirements.txt)
+- **Test Token:** Pharos Atlantic Faucet
 
-## Configuration
+## 🛠 Installation
 
-- **pools.json:** You will find the file `pools.json` inside the project directory. Make sure `pools.json` contains data that matches the format expected by the script. Here are examples of file formats:
-  ```json
-    [    
-        {
-            "USDC_USDT": "Your USDC_USDT PMM Pool Address",
-            "USDT_USDC": "Your USDT_USDC PMM Pool Address"
-        }
-    ]
-  ```
-
-### Screenshots
-
-<div style="text-align: center;">
-  <img src="images/image1.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image2.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image3.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image4.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image5.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image6.png" alt="Image" width="500"/>
-</div>
-<div style="text-align: center;">
-  <img src="images/image7.png" alt="Image" width="500"/>
-</div>
-  
-- **accounts.txt:** You will find the file `accounts.txt` inside the project directory. Make sure `accounts.txt` contains data that matches the format expected by the script. Here are examples of file formats:
-  ```bash
-    your_private_key_1
-    your_private_key_2
-  ```
-
-- **proxy.txt:** You will find the file `proxy.txt` inside the project directory. Make sure `proxy.txt` contains data that matches the format expected by the script. Here are examples of file formats:
-  ```bash
-    ip:port # Default Protcol HTTP.
-    protocol://ip:port
-    protocol://user:pass@ip:port
-  ```
-
-## Run
+### 1. Clone the Repository
 
 ```bash
-python bot.py #or python3 bot.py
+git clone https://github.com/vonssy/Faroswap-BOT.git
+cd Faroswap-BOT
 ```
 
-## Buy Me a Coffee
+### 2. Install Dependencies
 
-- **EVM:** 0xe3c9ef9a39e9eb0582e5b147026cae524338521a
-- **TON:** UQBEFv58DC4FUrGqinBB5PAQS7TzXSm5c1Fn6nkiet8kmehB
-- **SOL:** E1xkaJYmAFEj28NPHKhjbf7GcvfdjKdvXju8d8AeSunf
-- **SUI:** 0xa03726ecbbe00b31df6a61d7a59d02a7eedc39fe269532ceab97852a04cf3347
+```bash
+pip install -r requirements.txt
+# or for Python 3 specifically
+pip3 install -r requirements.txt
+```
 
-Thank you for visiting this repository, don't forget to contribute in the form of follows and stars.
-If you have questions, find an issue, or have suggestions for improvement, feel free to contact me or open an *issue* in this GitHub repository.
+### 3. Library Version Management
 
-**vonssy**
+> ⚠️ **Important:** Ensure library versions match those specified in `requirements.txt`
+
+**Check installed library version:**
+```bash
+pip show library_name
+```
+
+**Uninstall conflicting library:**
+```bash
+pip uninstall library_name
+```
+
+**Install specific library version:**
+```bash
+pip install library_name==version
+```
+
+## ⚙️ Configuration
+
+### Account Setup
+
+Create or edit `accounts.txt` in the project directory:
+
+```
+your_private_key_1
+your_private_key_2
+your_private_key_3
+```
+
+### Proxy Configuration (Optional)
+
+Create or edit `proxy.txt` in the project directory:
+
+```
+# Simple format (HTTP protocol by default)
+192.168.1.1:8080
+
+# With protocol specification
+http://192.168.1.1:8080
+https://192.168.1.1:8080
+
+# With authentication
+http://username:password@192.168.1.1:8080
+```
+
+## 🚀 Usage
+
+Run the bot using one of the following commands:
+
+```bash
+python bot.py
+# or for Python 3 specifically
+python3 bot.py
+```
+
+### Runtime Options
+
+When starting the bot, you'll be prompted to choose:
+
+1. **Proxy Mode Selection:**
+   - Option `1`: Run with proxy
+   - Option `2`: Run without proxy
+
+2. **Auto-Rotation:** 
+   - `y`: Enable automatic invalid proxy rotation
+   - `n`: Disable auto-rotation
+
+## 🌐 Proxy Recommendation
+
+<div align="left">
+  <img src="images/banner.png" alt="NST Proxy Banner" width="300">
+</div>
+
+For reliable multi-wallet automation and geo-restriction bypass, we recommend **Nstproxy**:
+
+### Why Nstproxy?
+- 💰 **Affordable pricing** starting from $0.1/GB
+- 🌍 **Global coverage** with multiple locations
+- 🔄 **Advanced rotation control**
+- 🛡️ **Anti-ban technology**
+
+### Get Started with Nstproxy
+- 🔗 **Website:** [Nstproxy.com](https://www.nstproxy.com/?utm_source=vonssy)
+- 💬 **Telegram:** [@nstproxy](https://t.me/nstproxy)
+- 🎮 **Discord:** [Join Server](https://discord.gg/5jjWCAmvng)
+- 📚 **GitHub:** [Nstproxy Repository](https://github.com/Nstproxy)
+
+> 🎁 **Special Offer:** Use code `VONSSY` for **10% OFF** your first purchase!
+
+## 💖 Support the Project
+
+If this project has been helpful to you, consider supporting its development:
+
+### Cryptocurrency Donations
+
+| Network | Address |
+|---------|---------|
+| **EVM** | `0xe3c9ef9a39e9eb0582e5b147026cae524338521a` |
+| **TON** | `UQBEFv58DC4FUrGqinBB5PAQS7TzXSm5c1Fn6nkiet8kmehB` |
+| **SOL** | `E1xkaJYmAFEj28NPHKhjbf7GcvfdjKdvXju8d8AeSunf` |
+| **SUI** | `0xa03726ecbbe00b31df6a61d7a59d02a7eedc39fe269532ceab97852a04cf3347` |
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+1. ⭐ **Star this repository** if you find it useful
+2. 👥 **Follow** for updates on new features
+3. 🐛 **Report issues** via GitHub Issues
+4. 💡 **Suggest improvements** or new features
+5. 🔧 **Submit pull requests** for bug fixes or enhancements
+
+## 📞 Contact & Support
+
+- **Developer:** vonssy
+- **Issues:** [GitHub Issues](https://github.com/vonssy/Faroswap-BOT/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/vonssy/Faroswap-BOT/discussions)
+
+---
+
+<div align="center">
+
+**Made with ❤️ by [vonssy](https://github.com/vonssy)**
+
+*Thank you for using Faroswap BOT! Don't forget to ⭐ star this repository.*
+
+</div>
